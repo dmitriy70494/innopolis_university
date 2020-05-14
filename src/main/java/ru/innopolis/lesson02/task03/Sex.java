@@ -1,4 +1,4 @@
 package ru.innopolis.lesson02.task03;
-
-public class Sex {
+public enum Sex {
+    MAN, WOMAN;
 }
