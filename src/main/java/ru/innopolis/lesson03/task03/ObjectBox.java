@@ -1,19 +1,19 @@
-package ru.innopolis.lesson03.task02;
+package ru.innopolis.lesson03.task03;
 
 import java.util.Set;
 
-public class ObjectBox {
-    Set<Object> objects;
+public class ObjectBox<E> {
+    Set<E> objects;
 
-    public boolean addObject(Object obj) {
-        return this.objects.add(obj);
+    public boolean addObject(E obj) {
+        return objects.add(obj);
     }
 
-    public boolean deleteObject(Object obj) {
-        return this.objects.remove(obj);
+    public boolean deleteObject(E obj) {
+        return objects.remove(obj);
     }
 
     public void dump() {
-        System.out.println(this.objects.toString());
+        System.out.println(objects.toString());
     }
 }
