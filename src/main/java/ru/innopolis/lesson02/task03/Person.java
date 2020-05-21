@@ -1,6 +1,8 @@
 package ru.innopolis.lesson02.task03;
 
-public class Person {
+import java.util.Objects;
+
+public class Person implements Comparable{
 
     private int age;
 
@@ -49,5 +51,41 @@ public class Person {
                 ", sex=" + sex +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Person)) return false;
+        Person person = (Person) o;
+        return getAge() == person.getAge() &&
+                getSex() == person.getSex() &&
+                Objects.equals(getName(), person.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getAge(), getSex(), getName());
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        int result = 0;
+        if (this.getClass() != o.getClass()) {
+            throw new ClassCastException();
+        } else {
+            Person person = (Person) o;
+            if (this != person && this.getAge() == person.getAge() && this.getName().equals(person.getName())) {
+                throw new UserIllegalException("имена людей и возраст совпадают" + this + person);
+            }
+            result = this.getSex().compareTo(person.getSex());
+            if (result == 0) {
+                result = Integer.compare(this.getAge(), person.getAge());
+                if (result == 0) {
+                    result = this.getName().compareTo(person.getName());
+                }
+            }
+        }
+        return result;
     }
 }
