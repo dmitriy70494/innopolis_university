@@ -1,5 +1,8 @@
 package ru.innopolis.lesson15;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -12,7 +15,10 @@ public class PropertiesApl {
 
     private Properties properties;
 
+    private static final Logger logger = LoggerFactory.getLogger(PropertiesApl.class);
+
     private PropertiesApl() {
+        Main.securityLogger.info("create PropertiesApl");
         if (instance != null) {
             throw new AssertionError();
         }
@@ -37,8 +43,7 @@ public class PropertiesApl {
         try (FileInputStream fileInputStream = new FileInputStream(PATH_TO_PROPERTIES)) {
             this.properties.load(fileInputStream);
         } catch (IOException e) {
-            System.out.println("Ошибка в программе: файл " + PATH_TO_PROPERTIES + " не обнаружено");
-            e.printStackTrace();
+            logger.error("Ошибка в программе: файл " + PATH_TO_PROPERTIES + " не обнаружено", e);
         }
     }
 
