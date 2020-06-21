@@ -47,4 +47,14 @@ public class Brand {
     public void setCount(int count) {
         this.count = count;
     }
+
+    @Override
+    public String toString() {
+        return "Brand{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", count=" + count +
+                '}';
+    }
 }

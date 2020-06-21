@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/log.log</file>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>log.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- Храним файлы логов 10 дней -->
+            <maxHistory>2</maxHistory>
+            <!-- Максимальный размер файлов лога 30 гигабайт -->
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{dd.MM.yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{20} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/analytics.log</file>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>analytics.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- Храним файлы логов 10 дней -->
+            <maxHistory>2</maxHistory>
+            <!-- Максимальный размер файлов лога 30 гигабайт -->
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{dd.MM.yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{20} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="db" class="ch.qos.logback.classic.db.DBAppender">
+        <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+            <driverClass>org.postgresql.Driver</driverClass>
+            <url>jdbc:postgresql://127.0.0.1:5432/logdb</url>
+            <user>postgres</user>
+            <password>postgres</password>
+        </connectionSource>
+    </appender>
+
+    <logger name="analytics" level="info" additivity="false">
+        <appender-ref ref="INFO_FILE"/>
+    </logger>
+
+    <logger name="security" level="info" additivity="false">
+        <appender-ref ref="db"/>
+    </logger>
+
+    <root level="debug">
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>
