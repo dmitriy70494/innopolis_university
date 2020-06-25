@@ -1,32 +1,36 @@
-package ru.innopolis.lesson15;
+package ru.innopolis.lesson15.repository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.innopolis.lesson15.Main;
+import ru.innopolis.lesson15.connection.ConnectionManager;
+import ru.innopolis.lesson15.entity.Brand;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class BrandsRepository {
 
+    public static final String INSERT_BRAND = "INSERT INTO brands (name, price, count) VALUES (?, ?, ?);";
+    public static final String UPDATE_BRAND = "UPDATE brands SET name = ?, price = ?, count = ? WHERE id = ?";
+    public static final String INSERT_BRAND_HISTORY = "INSERT INTO brands_history (name, price, count, brand_id) VALUES (?, ?, ?, ?);";
+    public static final String GET_BRAND = "SELECT id, name, price, count FROM brands WHERE id = ?";
+
     private static final Logger logger = LoggerFactory.getLogger(BrandsRepository.class);
 
-    private static final BrandsRepository instance = new BrandsRepository();
+    private ConnectionManager connectionManager;
 
-    private BrandsRepository() {
+    public BrandsRepository(ConnectionManager connectionManager) {
         Main.securityLogger.info("create BrandsRepository");
-    }
-
-    public static BrandsRepository getInstance() {
-        return instance;
+        this.connectionManager = connectionManager;
     }
 
     public int save(Brand brand) {
         int result = 0;
-        try (Connection connection = DBUtil.getConnection();
+        try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
-                     SQLConstant.INSERT_BRAND, Statement.RETURN_GENERATED_KEYS)) {
+                     INSERT_BRAND, Statement.RETURN_GENERATED_KEYS)) {
             this.fillStatementBrand(preparedStatement, brand);
             result = preparedStatement.executeUpdate();
             if (result == 0) {
@@ -36,7 +40,7 @@ public class BrandsRepository {
                 if (generatedKeys.next()) {
                     result = generatedKeys.getInt(1);
                 } else {
-                    throw new SQLException("Creating user failed, no ID obtained.");
+                    throw new SQLException("Creating brand failed, no ID obtained.");
                 }
             }
         } catch (Exception e) {
@@ -48,8 +52,8 @@ public class BrandsRepository {
 
     public List<Integer> saveAll(List<Brand> brands) {
         List<Integer> ids = new ArrayList<>();
-        try (Connection connection = DBUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SQLConstant.INSERT_BRAND, new String[]{"id"})) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_BRAND, new String[]{"id"})) {
             for (Brand brand : brands) {
                 this.fillStatementBrand(preparedStatement, brand);
                 preparedStatement.addBatch();
@@ -69,17 +73,17 @@ public class BrandsRepository {
 
     public boolean update(Brand brand) {
         boolean result = true;
-        try (Connection connection = DBUtil.getConnection();
-             PreparedStatement statementOldBrand = connection.prepareStatement(SQLConstant.GET_BRAND)) {
+        try (Connection connection = connectionManager.getConnection();
+             PreparedStatement statementOldBrand = connection.prepareStatement(GET_BRAND)) {
             connection.setAutoCommit(false);
             statementOldBrand.setInt(1, brand.getId());
             Savepoint point = connection.setSavepoint("savepoint");
             try (ResultSet resultOldBrand = statementOldBrand.executeQuery();
-                 PreparedStatement statementHistory = connection.prepareStatement(SQLConstant.INSERT_BRAND_HISTORY);) {
+                 PreparedStatement statementHistory = connection.prepareStatement(INSERT_BRAND_HISTORY)) {
                 this.fillStatementHistory(resultOldBrand, statementHistory);
                 statementHistory.executeUpdate();
             }
-            try (PreparedStatement statementBrand = connection.prepareStatement(SQLConstant.UPDATE_BRAND)) {
+            try (PreparedStatement statementBrand = connection.prepareStatement(UPDATE_BRAND)) {
                 fillStatementBrand(statementBrand, brand);
                 statementBrand.setInt(4, brand.getId());
                 statementBrand.executeUpdate();

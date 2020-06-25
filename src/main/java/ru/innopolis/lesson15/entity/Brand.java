@@ -1,4 +1,4 @@
-package ru.innopolis.lesson15;
+package ru.innopolis.lesson15.entity;
 
 public class Brand {
 
