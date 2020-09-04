@@ -17,7 +17,7 @@ import ru.innopolis.lesson02.task03.Sex;
 /**
  * Класс, сериализующий объекты в *.json и десериализующий их обратно
  *
- * @author Marina_Larionova
+ * @author Dmitriy_Balandin
  * @version 1.0.0
  */
 public class Serializer {
